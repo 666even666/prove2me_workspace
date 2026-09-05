@@ -251,9 +251,40 @@ theorem rfr_estimator_unbiased_v2
     rw [← hinv']
   -- Assemble: sum the per-coordinate results and match against `dotProduct q k`.
   simp_rw [hstep2]
-  rw [← Complex.re_sum]
+  rw [← Complex.re_sum, ← Finset.sum_mul, Complex.re_mul_ofReal]
   congr 1
-  rw [← Finset.sum_mul]
-  sorry
+  rw [Complex.re_sum]
+  have hterm : ∀ i : Fin n,
+      (((featurePair n q i 0 : ℂ) + (featurePair n q i 1 : ℂ) * Complex.I) *
+        (starRingEnd ℂ ((featurePair n k i 0 : ℂ) + (featurePair n k i 1 : ℂ) * Complex.I))).re
+      = dotProduct (featurePair n q i) (featurePair n k i) := by
+    intro i
+    simp only [dotProduct, Fin.sum_univ_two, map_add, map_mul, Complex.conj_ofReal,
+      Complex.conj_I, Complex.add_re, Complex.add_im, Complex.mul_re, Complex.mul_im,
+      Complex.I_re, Complex.I_im, Complex.ofReal_re, Complex.ofReal_im, Complex.neg_re,
+      Complex.neg_im, mul_zero, mul_one, zero_mul, sub_zero, add_zero, zero_add, neg_zero]
+    ring
+  simp_rw [hterm]
+  -- Pairs-splitting: the sum of the `n` pairwise dot products equals the full `2n`-dim dot
+  -- product, via the bijection `Fin n × Fin 2 ≃ Fin (2 * n)`, `(j, r) ↦ 2 * j + r`.
+  show ∑ i : Fin n, dotProduct (featurePair n q i) (featurePair n k i) = dotProduct q k
+  simp only [dotProduct]
+  rw [← Finset.sum_product', Finset.univ_product_univ]
+  refine Finset.sum_nbij'
+    (i := fun p : Fin n × Fin 2 => (⟨2 * p.1.1 + p.2.1, by
+      have h1 := p.1.2; have h2 := p.2.2; omega⟩ : Fin (2 * n)))
+    (j := fun x : Fin (2 * n) => ((⟨x.1 / 2, by have := x.2; omega⟩ : Fin n),
+      (⟨x.1 % 2, by omega⟩ : Fin 2)))
+    (fun _ _ => Finset.mem_univ _) (fun _ _ => Finset.mem_univ _) ?_ ?_ ?_
+  · intro p _
+    have h2 := p.2.2
+    refine Prod.ext (Fin.ext ?_) (Fin.ext ?_) <;> simp only [] <;> omega
+  · intro x _
+    refine Fin.ext ?_
+    simp only []
+    omega
+  · intro p _
+    obtain ⟨j, r⟩ := p
+    fin_cases r <;> simp [featurePair]
 
 end ClockRoPE
