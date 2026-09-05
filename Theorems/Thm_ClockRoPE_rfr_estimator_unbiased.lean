@@ -1,6 +1,6 @@
 import Mathlib
-import Definitions.Def_pos_def_kernel
-import Definitions.Def_random_fourier_rotation
+import Definitions.Def_PosDefKernel
+import Definitions.Def_RandomFourierRotation
 
 namespace ClockRoPE
 

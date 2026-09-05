@@ -1,5 +1,5 @@
 import Mathlib
-import Definitions.Def_pos_def_kernel
+import Definitions.Def_PosDefKernel
 
 namespace ClockRoPE
 
