@@ -96,6 +96,164 @@ theorem rfr_estimator_unbiased_v2
       Complex.neg_im, mul_zero, mul_one, zero_mul, sub_zero, add_zero,
       zero_add, neg_zero]
     ring
+  -- Each per-coordinate term is bounded, hence integrable against the probability measure `μ`.
+  -- (Stated with `+ -(...)` rather than `-(...)` to match the shape `simp` produces below.)
+  have hbdd : ∀ (a0 a1 b0 b1 θm θn : ℝ),
+      |(Real.cos θm * a0 + -Real.sin θm * a1) * (Real.cos θn * b0 + -Real.sin θn * b1)
+        + (Real.sin θm * a0 + Real.cos θm * a1) * (Real.sin θn * b0 + Real.cos θn * b1)|
+      ≤ 2 * (|a0| + |a1|) * (|b0| + |b1|) := by
+    intro a0 a1 b0 b1 θm θn
+    have hc1 : |Real.cos θm * a0 + -Real.sin θm * a1| ≤ |a0| + |a1| := by
+      have e1 : |Real.cos θm * a0| ≤ |a0| :=
+        calc |Real.cos θm * a0| = |Real.cos θm| * |a0| := abs_mul _ _
+          _ ≤ 1 * |a0| := by gcongr; exact Real.abs_cos_le_one θm
+          _ = |a0| := one_mul _
+      have e2 : |(-Real.sin θm) * a1| ≤ |a1| :=
+        calc |(-Real.sin θm) * a1| = |Real.sin θm| * |a1| := by rw [abs_mul, abs_neg]
+          _ ≤ 1 * |a1| := by gcongr; exact Real.abs_sin_le_one θm
+          _ = |a1| := one_mul _
+      exact (abs_add_le _ _).trans (add_le_add e1 e2)
+    have hc2 : |Real.cos θn * b0 + -Real.sin θn * b1| ≤ |b0| + |b1| := by
+      have e1 : |Real.cos θn * b0| ≤ |b0| :=
+        calc |Real.cos θn * b0| = |Real.cos θn| * |b0| := abs_mul _ _
+          _ ≤ 1 * |b0| := by gcongr; exact Real.abs_cos_le_one θn
+          _ = |b0| := one_mul _
+      have e2 : |(-Real.sin θn) * b1| ≤ |b1| :=
+        calc |(-Real.sin θn) * b1| = |Real.sin θn| * |b1| := by rw [abs_mul, abs_neg]
+          _ ≤ 1 * |b1| := by gcongr; exact Real.abs_sin_le_one θn
+          _ = |b1| := one_mul _
+      exact (abs_add_le _ _).trans (add_le_add e1 e2)
+    have hs1 : |Real.sin θm * a0 + Real.cos θm * a1| ≤ |a0| + |a1| := by
+      have e1 : |Real.sin θm * a0| ≤ |a0| :=
+        calc |Real.sin θm * a0| = |Real.sin θm| * |a0| := abs_mul _ _
+          _ ≤ 1 * |a0| := by gcongr; exact Real.abs_sin_le_one θm
+          _ = |a0| := one_mul _
+      have e2 : |Real.cos θm * a1| ≤ |a1| :=
+        calc |Real.cos θm * a1| = |Real.cos θm| * |a1| := abs_mul _ _
+          _ ≤ 1 * |a1| := by gcongr; exact Real.abs_cos_le_one θm
+          _ = |a1| := one_mul _
+      exact (abs_add_le _ _).trans (add_le_add e1 e2)
+    have hs2 : |Real.sin θn * b0 + Real.cos θn * b1| ≤ |b0| + |b1| := by
+      have e1 : |Real.sin θn * b0| ≤ |b0| :=
+        calc |Real.sin θn * b0| = |Real.sin θn| * |b0| := abs_mul _ _
+          _ ≤ 1 * |b0| := by gcongr; exact Real.abs_sin_le_one θn
+          _ = |b0| := one_mul _
+      have e2 : |Real.cos θn * b1| ≤ |b1| :=
+        calc |Real.cos θn * b1| = |Real.cos θn| * |b1| := abs_mul _ _
+          _ ≤ 1 * |b1| := by gcongr; exact Real.abs_cos_le_one θn
+          _ = |b1| := one_mul _
+      exact (abs_add_le _ _).trans (add_le_add e1 e2)
+    calc |(Real.cos θm * a0 + -Real.sin θm * a1) * (Real.cos θn * b0 + -Real.sin θn * b1)
+          + (Real.sin θm * a0 + Real.cos θm * a1) * (Real.sin θn * b0 + Real.cos θn * b1)|
+        ≤ |(Real.cos θm * a0 + -Real.sin θm * a1) * (Real.cos θn * b0 + -Real.sin θn * b1)|
+          + |(Real.sin θm * a0 + Real.cos θm * a1) * (Real.sin θn * b0 + Real.cos θn * b1)| :=
+          abs_add_le _ _
+      _ = |Real.cos θm * a0 + -Real.sin θm * a1| * |Real.cos θn * b0 + -Real.sin θn * b1|
+          + |Real.sin θm * a0 + Real.cos θm * a1| * |Real.sin θn * b0 + Real.cos θn * b1| := by
+          rw [abs_mul, abs_mul]
+      _ ≤ (|a0| + |a1|) * (|b0| + |b1|) + (|a0| + |a1|) * (|b0| + |b1|) := by
+          gcongr
+      _ = 2 * (|a0| + |a1|) * (|b0| + |b1|) := by ring
+  have hInt : ∀ j : Fin n, Integrable
+      (fun ξ : Fin n → ℝ => dotProduct
+        (Matrix.mulVec (rotation2 (2 * Real.pi * ξ j * pm)) (featurePair n q j))
+        (Matrix.mulVec (rotation2 (2 * Real.pi * ξ j * pn)) (featurePair n k j))) μ := by
+    intro j
+    apply Integrable.of_mem_Icc
+      (-(2 * (|featurePair n q j 0| + |featurePair n q j 1|) *
+          (|featurePair n k j 0| + |featurePair n k j 1|)))
+      (2 * (|featurePair n q j 0| + |featurePair n q j 1|) *
+          (|featurePair n k j 0| + |featurePair n k j 1|))
+    · apply Continuous.aemeasurable
+      simp only [rotation2, Matrix.mulVec, dotProduct, Matrix.cons_val_zero,
+        Matrix.cons_val_one, Fin.sum_univ_two, Matrix.of_apply,
+        Matrix.cons_val', Matrix.empty_val', Matrix.cons_val_fin_one]
+      fun_prop
+    · refine Filter.Eventually.of_forall (fun ξ => ?_)
+      simp only [rotation2, Matrix.mulVec, dotProduct, Matrix.cons_val_zero,
+        Matrix.cons_val_one, Fin.sum_univ_two, Matrix.of_apply,
+        Matrix.cons_val', Matrix.empty_val', Matrix.cons_val_fin_one]
+      exact abs_le.mp (hbdd _ _ _ _ _ _)
+  -- Swap sum and integral, then rewrite each term via `hpair`.
+  simp_rw [hrw]
+  rw [MeasureTheory.integral_finsetSum _ (fun j _ => hInt j)]
+  have hstep2 : ∀ j : Fin n,
+      (∫ ξ : Fin n → ℝ, dotProduct
+        (Matrix.mulVec (rotation2 (2 * Real.pi * ξ j * pm)) (featurePair n q j))
+        (Matrix.mulVec (rotation2 (2 * Real.pi * ξ j * pn)) (featurePair n k j)) ∂μ)
+      = (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+          (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+          (f (pm - pn) : ℂ)).re := by
+    intro j
+    have hcongr : (fun ξ : Fin n → ℝ => dotProduct
+          (Matrix.mulVec (rotation2 (2 * Real.pi * ξ j * pm)) (featurePair n q j))
+          (Matrix.mulVec (rotation2 (2 * Real.pi * ξ j * pn)) (featurePair n k j)))
+        = fun ξ => (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+            (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+            Complex.exp (2 * Real.pi * Complex.I * (ξ j) * (pm - pn))).re :=
+      funext fun ξ => hpair j (ξ j)
+    rw [hcongr, hmarg j
+      (fun x => (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+          (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+          Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn))).re) (by fun_prop)]
+    rw [show ν = (volume : Measure ℝ).withDensity fun x => ENNReal.ofReal (τ x) from hνdef]
+    have hmeasτ : Measurable fun x : ℝ => ENNReal.ofReal (τ x) :=
+      (ENNReal.measurable_ofReal).comp hτcont.measurable
+    rw [integral_withDensity_eq_integral_toReal_smul hmeasτ
+      (Filter.Eventually.of_forall fun x => ENNReal.ofReal_lt_top)]
+    have hpt : ∀ x : ℝ, (ENNReal.ofReal (τ x)).toReal •
+        (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+          (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+          Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn))).re
+      = (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+          (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+          ((τ x : ℂ) * Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn)))).re := by
+      intro x
+      rw [ENNReal.toReal_ofReal (hτnonneg x), smul_eq_mul,
+        show (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+            (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+            ((τ x : ℂ) * Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn))))
+          = (τ x : ℂ) * (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+            (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+            Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn))) from by ring,
+        Complex.re_ofReal_mul]
+    simp_rw [hpt]
+    have hAB_int : Integrable
+        (fun x : ℝ => (τ x : ℂ) * Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn)))
+        (volume : Measure ℝ) := by
+      apply hτ_int.ofReal.mul_bdd (c := 1)
+      · fun_prop
+      · refine Filter.Eventually.of_forall fun x => ?_
+        rw [show (2 : ℂ) * Real.pi * Complex.I * x * (pm - pn)
+            = ((2 * Real.pi * x * (pm - pn) : ℝ) : ℂ) * Complex.I by push_cast; ring,
+          Complex.norm_exp_ofReal_mul_I]
+    have hF_int : Integrable
+        (fun x : ℝ => ((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+          (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+          ((τ x : ℂ) * Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn))))
+        (volume : Measure ℝ) := hAB_int.const_mul _
+    show ∫ x : ℝ, RCLike.re
+        (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+          (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+          ((τ x : ℂ) * Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn))))
+        ∂(volume : Measure ℝ)
+      = RCLike.re (((featurePair n q j 0 : ℂ) + (featurePair n q j 1 : ℂ) * Complex.I) *
+          (starRingEnd ℂ ((featurePair n k j 0 : ℂ) + (featurePair n k j 1 : ℂ) * Complex.I)) *
+          (f (pm - pn) : ℂ))
+    rw [integral_re hF_int]
+    congr 1
+    rw [MeasureTheory.integral_const_mul,
+      show (fun x : ℝ => (τ x : ℂ) * Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn)))
+          = (fun x : ℝ => Complex.exp (2 * Real.pi * Complex.I * x * (pm - pn)) * (τ x : ℂ))
+        from funext fun x => mul_comm _ _]
+    have hinv' := hinv (pm - pn)
+    push_cast at hinv'
+    rw [← hinv']
+  -- Assemble: sum the per-coordinate results and match against `dotProduct q k`.
+  simp_rw [hstep2]
+  rw [← Complex.re_sum]
+  congr 1
+  rw [← Finset.sum_mul]
   sorry
 
 end ClockRoPE
