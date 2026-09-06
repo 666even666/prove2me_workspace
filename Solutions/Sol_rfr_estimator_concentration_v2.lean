@@ -4,20 +4,11 @@ import Definitions.Def_RandomFourierRotation
 import Theorems.Thm_ClockRoPE_fourierTransform_bochner_inversion
 import Theorems.Thm_ClockRoPE_rfr_estimator_unbiased_v2
 
-namespace ClockRoPE
-
 open MeasureTheory ProbabilityTheory
 open scoped NNReal
+open ClockRoPE
 
-/-- **Proposition 3.2 (Convergence of Random Fourier Rotation Estimator)** — corrected against
-`IsPositiveDefiniteKernel`, superseding `ClockRoPE.rfr_estimator_concentration`, which used the
-under-hypothesized `IsPosDefKernel`.
-Under the same setting as `rfr_estimator_unbiased_v2` (a continuous, integrable, positive-definite
-kernel `f` with `f 0 = 1`, its Fourier transform `τ`, `n` i.i.d. frequencies `ξ_0, …, ξ_{n-1} ∼
-τ`, and query/key vectors `q_m, k_n ∈ ℝ^{2n}` at positions `p_m, p_n`), the averaged estimator
-`(1/n) · ĝ(q_m, k_n, p_m, p_n)` concentrates around `(1/n) · q_m^⊤ k_n · f(p_m - p_n)` at a rate
-governed by a McDiarmid-type exponential tail bound. -/
-theorem rfr_estimator_concentration_v2
+theorem solution
     (f : ℝ → ℝ) (hf_cont : Continuous f) (hf_int : Integrable f (volume : Measure ℝ))
     (hf_pd : IsPositiveDefiniteKernel f) (hf0 : f 0 = 1)
     (n : ℕ) (q k : Fin (2 * n) → ℝ) (pm pn : ℝ) (ε : ℝ) (hε : 0 < ε) :
@@ -203,5 +194,3 @@ theorem rfr_estimator_concentration_v2
         rw [measureReal_def, ENNReal.ofReal_toReal (measure_ne_top _ _)]
     _ ≤ ENNReal.ofReal (2 * Real.exp (-(ε ^ 2 * (2 * (n : ℝ)) ^ 2 / (8 * ∑ j, (M j) ^ 2)))) :=
         ENNReal.ofReal_le_ofReal hfinal
-
-end ClockRoPE
