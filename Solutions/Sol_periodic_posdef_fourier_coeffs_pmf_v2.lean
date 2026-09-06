@@ -3,10 +3,8 @@ import Definitions.Def_PositiveDefiniteKernel
 import Theorems.Thm_ClockRoPE_posDef_continuous_extension
 import Theorems.Thm_ClockRoPE_fejer_cesaro_mean_periodic_at_zero
 
-namespace ClockRoPE
-
 open MeasureTheory intervalIntegral Filter
-
+open ClockRoPE
 /-- **Corollary 3.3 (Periodic Case via Herglotz's Theorem)** — corrected against
 `IsPositiveDefiniteKernel`, superseding `ClockRoPE.periodic_posdef_fourier_coeffs_pmf`, which
 used the under-hypothesized `IsPosDefKernel`.
@@ -17,7 +15,7 @@ Let `f : ℝ → ℝ` be a continuous, positive-definite, `T`-periodic kernel wi
 manifestly a real number). By Herglotz's theorem, `{α_k}` are all nonnegative and sum to
 `f 0 = 1`, i.e. they form a valid probability mass function over the discrete harmonics
 `{k / T}`. -/
-theorem periodic_posdef_fourier_coeffs_pmf_v2
+theorem solution
     (f : ℝ → ℝ) (T : ℝ) (hT : 0 < T)
     (hf_cont : Continuous f) (hf_pd : IsPositiveDefiniteKernel f) (hf0 : f 0 = 1)
     (hf_periodic : ∀ x : ℝ, f (x + T) = f x)
@@ -238,4 +236,3 @@ theorem periodic_posdef_fourier_coeffs_pmf_v2
       exact le_of_tendsto' hconv hab
   exact (hasSum_of_isLUB_of_nonneg 1 hnonneg hLUB).tsum_eq
 
-end ClockRoPE
