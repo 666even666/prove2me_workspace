@@ -2,13 +2,9 @@ import Mathlib
 import Definitions.Def_rayleighQuotient
 import Theorems.Thm_PowerMethod_rescaled_iterate_tendsto
 
-namespace PowerMethod
+open PowerMethod
 
-/-- **The power method converges** (Goal). Let `T` be self-adjoint on a finite-dimensional inner
-product space `E`, with eigenvalue `hT.eigenvalues hn i0` strictly dominant in absolute value, and
-let the starting vector `x0` have a nonzero component along the corresponding eigenvector. Then the
-Rayleigh quotients of the power iterates `T^k x0` converge to the dominant eigenvalue. -/
-theorem rayleighQuotient_iterate_tendsto
+theorem solution
     {𝕜 : Type*} [RCLike 𝕜] {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
     [FiniteDimensional 𝕜 E] {T : E →ₗ[𝕜] E} (hT : T.IsSymmetric) {n : ℕ}
     (hn : Module.finrank 𝕜 E = n) (x0 : E) (i0 : Fin n)
@@ -80,5 +76,3 @@ theorem rayleighQuotient_iterate_tendsto
     hnum_tendsto.div hden_tendsto (pow_ne_zero 2 (norm_ne_zero_iff.mpr hL_ne))
   rw [hRL] at hquot_tendsto
   simpa only [hTk] using hquot_tendsto
-
-end PowerMethod
