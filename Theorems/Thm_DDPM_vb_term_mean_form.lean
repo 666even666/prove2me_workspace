@@ -1,10 +1,8 @@
 import Definitions.Def_DDPM_process
+open MeasureTheory Real
 
 namespace DDPM
 
-open MeasureTheory Real
-
-/-- Eq. (8) -/
 theorem vb_term_mean_form {d : ℕ} (s : Schedule) (t : ℕ) (ht : 2 ≤ t)
     (mu : ℕ → Space d → Space d) (v : ℕ → ℝ) (hv : 0 < v t) (x0 : Space d)
     (hint : Integrable fun xt : Space d =>

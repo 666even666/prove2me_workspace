@@ -1,10 +1,8 @@
 import Definitions.Def_DDPM_process
+open MeasureTheory Real
 
 namespace DDPM
 
-open MeasureTheory Real
-
-/-- Eq. (5) -/
 theorem vb_decomposition {d : ℕ} (s : Schedule) (T : ℕ) (hT : 1 ≤ T)
     (mu : ℕ → Space d → Space d) (v : ℕ → ℝ) (hv : ∀ t, 0 < v t) (x0 : Space d)
     (hL : Integrable fun y : Fin T → Space d =>

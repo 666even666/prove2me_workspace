@@ -1,10 +1,8 @@
 import Definitions.Def_DDPM_process
+open MeasureTheory Real
 
 namespace DDPM
 
-open MeasureTheory Real
-
-/-- Eq. (3) -/
 theorem variational_bound {d : ℕ} (s : Schedule) (T : ℕ)
     (mu : ℕ → Space d → Space d) (v : ℕ → ℝ) (hv : ∀ t, 0 < v t) (x0 : Space d)
     (hp : Integrable fun y : Fin T → Space d => pJoint T mu v (Fin.cons x0 y))
