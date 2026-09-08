@@ -1,5 +1,5 @@
 import Mathlib
-import Definitions.Def_Grover_iterate
+import Definitions.Def_groverIterate
 
 namespace Grover
 

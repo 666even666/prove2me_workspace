@@ -1,6 +1,6 @@
 import Mathlib
-import Definitions.Def_Grover_oracle
-import Definitions.Def_Grover_diffusion
+import Definitions.Def_oracle
+import Definitions.Def_diffusion
 
 namespace Grover
 

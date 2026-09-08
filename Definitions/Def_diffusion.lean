@@ -1,5 +1,5 @@
 import Mathlib
-import Definitions.Def_Grover_uniformSuperposition
+import Definitions.Def_uniformSuperposition
 
 namespace Grover
 
