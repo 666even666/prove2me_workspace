@@ -1,12 +1,6 @@
 import Mathlib
 
-namespace PowerMethod
-
-/-- **Spectral decomposition of iterates.** For a self-adjoint operator `T` on a finite-dimensional
-inner product space `E`, expanding a vector `x0` in the orthonormal eigenbasis of `T` shows that
-the `k`-th iterate `T^k x0` is obtained by raising each eigenvalue coefficient to the `k`-th
-power. -/
-theorem iterate_eq_sum
+theorem solution
     {𝕜 : Type*} [RCLike 𝕜] {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
     [FiniteDimensional 𝕜 E] {T : E →ₗ[𝕜] E} (hT : T.IsSymmetric) {n : ℕ}
     (hn : Module.finrank 𝕜 E = n) (x0 : E) (k : ℕ) :
@@ -20,5 +14,3 @@ theorem iterate_eq_sum
     rw [pow_succ', Module.End.mul_apply, ih, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, hT.apply_eigenvectorBasis hn, smul_smul, pow_succ, mul_assoc]
-
-end PowerMethod

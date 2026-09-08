@@ -1,14 +1,9 @@
 import Mathlib
 import Theorems.Thm_PowerMethod_iterate_eq_sum
 
-namespace PowerMethod
+open PowerMethod
 
-/-- **Convergence of the rescaled power iterates.** Let `T` be self-adjoint on a finite-dimensional
-inner product space `E`, with eigenvalue `hT.eigenvalues hn i0` strictly dominant in absolute value
-over every other eigenvalue, and let `x0` have a nonzero component along the corresponding
-eigenvector. Then the iterates `T^k x0`, rescaled by `(eigenvalues i0)^k`, converge to the
-projection of `x0` onto the dominant eigenspace. -/
-theorem rescaled_iterate_tendsto
+theorem solution
     {𝕜 : Type*} [RCLike 𝕜] {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
     [FiniteDimensional 𝕜 E] {T : E →ₗ[𝕜] E} (hT : T.IsSymmetric) {n : ℕ}
     (hn : Module.finrank 𝕜 E = n) (x0 : E) (i0 : Fin n)
@@ -57,5 +52,3 @@ theorem rescaled_iterate_tendsto
         Filter.atTop (nhds 0) := by
       simpa using htend.const_mul ((hT.eigenvectorBasis hn).repr x0 i)
     simpa using hmul.smul_const (hT.eigenvectorBasis hn i)
-
-end PowerMethod
