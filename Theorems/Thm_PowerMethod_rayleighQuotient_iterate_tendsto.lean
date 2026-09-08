@@ -1,5 +1,5 @@
 import Mathlib
-import Definitions.Def_PowerMethod_rayleighQuotient
+import Definitions.Def_rayleighQuotient
 
 namespace PowerMethod
 
